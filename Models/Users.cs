@@ -1,6 +1,6 @@
 namespace Sklep_internetowy.Models
 {
-    public class ErrorViewModel
+    public class Users
     {
         public string? RequestId { get; set; }
 

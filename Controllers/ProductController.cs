@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Sklep_internetowy.Controllers
 {
-    public class HomeController1 : Controller
+    public class ProductController : Controller
     {
         // GET: HomeController1
         public ActionResult Index()
