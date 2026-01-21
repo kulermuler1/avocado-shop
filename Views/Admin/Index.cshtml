@@ -1,0 +1,177 @@
+@{
+    ViewData["Title"] = "Panel Administratora";
+}
+
+<div class="container">
+    <h1 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Panel Administratora</h1>
+
+    <!-- Statystyki -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">U¿ytkownicy</h6>
+                            <h2 class="mb-0">@ViewBag.TotalUsers</h2>
+                        </div>
+                        <i class="bi bi-people display-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-action="Users" class="text-white text-decoration-none small">
+                        Zobacz wszystkich <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Zamówienia</h6>
+                            <h2 class="mb-0">@ViewBag.TotalOrders</h2>
+                        </div>
+                        <i class="bi bi-bag-check display-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-action="Orders" class="text-white text-decoration-none small">
+                        Zobacz wszystkie <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Produkty</h6>
+                            <h2 class="mb-0">@ViewBag.TotalProducts</h2>
+                        </div>
+                        <i class="bi bi-box-seam display-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a asp-controller="ProductAdmin" asp-action="Index" class="text-white text-decoration-none small">
+                        Zarz¹dzaj <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1">Przychód</h6>
+                            <h2 class="mb-0">@(((decimal)ViewBag.TotalRevenue).ToString("N0")) z³</h2>
+                        </div>
+                        <i class="bi bi-cash-stack display-4 opacity-50"></i>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <span class="small">Suma wszystkich zamówieñ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Nowe zamówienia -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Nowe zamówienia</h5>
+                    <span class="badge bg-danger">@ViewBag.NewOrders</span>
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.RecentOrders != null && ((IEnumerable<Avocado_shop.Models.Order>)ViewBag.RecentOrders).Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Data</th>
+                                        <th>Kwota</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in (IEnumerable<Avocado_shop.Models.Order>)ViewBag.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td><strong>@order.Id</strong></td>
+                                            <td>@order.OrderDate.ToString("dd.MM.yyyy")</td>
+                                            <td>@order.TotalPrice.ToString("N2") z³</td>
+                                            <td>
+                                                @if (order.Status == "Nowe")
+                                                {
+                                                    <span class="badge bg-primary">@order.Status</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@order.Status</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">Brak zamówieñ</p>
+                    }
+                </div>
+                <div class="card-footer bg-white">
+                    <a asp-action="Orders" class="btn btn-outline-primary btn-sm">
+                        Zobacz wszystkie zamówienia
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Szybkie akcje -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Szybkie akcje</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a asp-controller="ProductAdmin" asp-action="Create" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-lg me-2"></i>Dodaj nowy produkt
+                        </a>
+                        <a asp-controller="CategoryAdmin" asp-action="Create" class="btn btn-outline-primary">
+                            <i class="bi bi-folder-plus me-2"></i>Dodaj now¹ kategoriê
+                        </a>
+                        <a asp-action="Users" class="btn btn-outline-primary">
+                            <i class="bi bi-people me-2"></i>Zarz¹dzaj u¿ytkownikami
+                        </a>
+                        <a asp-action="Orders" asp-route-status="Nowe" class="btn btn-outline-danger">
+                            <i class="bi bi-exclamation-circle me-2"></i>Nowe zamówienia do realizacji
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info o kategoriach -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-folder me-2"></i>Kategorie</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Liczba kategorii:</strong> @ViewBag.TotalCategories</p>
+                    <a asp-controller="CategoryAdmin" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        Zarz¹dzaj kategoriami
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

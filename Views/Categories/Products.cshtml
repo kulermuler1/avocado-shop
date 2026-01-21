@@ -1,0 +1,169 @@
+@model IEnumerable<Avocado_shop.Models.Product>
+
+@{
+    var category = ViewBag.Category as Avocado_shop.Models.Category;
+    ViewData["Title"] = category?.Name ?? "Produkty";
+}
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Strona g³ówna</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Categories" asp-action="Index">Kategorie</a></li>
+            @if (category?.ParentCategory != null)
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.ParentCategoryId">
+                        @category.ParentCategory.Name
+                    </a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@category?.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Sidebar z filtrami -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-funnel me-2"></i> Filtry
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label class="form-label">Cena minimalna</label>
+                            <input type="number" name="minPrice" class="form-control" value="@ViewBag.MinPrice" placeholder="Od...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cena maksymalna</label>
+                            <input type="number" name="maxPrice" class="form-control" value="@ViewBag.MaxPrice" placeholder="Do...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sortuj</label>
+                            <select name="sort" class="form-select">
+                                <option value="name" selected="@(ViewBag.Sort == "name")">Nazwa A-Z</option>
+                                <option value="price_asc" selected="@(ViewBag.Sort == "price_asc")">Cena: rosn¹co</option>
+                                <option value="price_desc" selected="@(ViewBag.Sort == "price_desc")">Cena: malej¹co</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-2"></i> Filtruj
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Powrót do kategorii -->
+            @if (category != null)
+            {
+                <div class="mt-3">
+                    @if (category.ParentCategoryId.HasValue)
+                    {
+                        <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.ParentCategoryId" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i> Wróæ do @category.ParentCategory?.Name
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Categories" asp-action="Index" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i> Wszystkie kategorie
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Lista produktów -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    @if (category != null && !string.IsNullOrEmpty(category.IconClass))
+                    {
+                        <i class="@category.IconClass me-2"></i>
+                    }
+                    @category?.Name
+                </h1>
+                <span class="badge bg-secondary">@Model.Count() produktów</span>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Brak produktów spe³niaj¹cych wybrane kryteria.
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                    @foreach (var product in Model)
+                    {
+                        <div class="col">
+                            <div class="card h-100 product-card">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 180px; object-fit: contain; padding: 10px; background: #f8f9fa;">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                        <i class="bi bi-image text-muted display-4"></i>
+                                    </div>
+                                }
+                                <div class="card-body">
+                                    <h6 class="card-title mb-2">@product.Name</h6>
+                                    <p class="card-text text-muted small mb-2">
+                                        @(product.Description?.Length > 60 ? product.Description.Substring(0, 60) + "..." : product.Description)
+                                    </p>
+                                    <p class="mb-0">
+                                        @if (product.Stock > 0)
+                                        {
+                                            <span class="badge bg-success">Dostêpny</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Niedostêpny</span>
+                                        }
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 mb-0 text-primary fw-bold">@product.Price.ToString("N2") z³</span>
+                                    </div>
+                                    <div class="mt-2 d-grid gap-2">
+                                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i> Szczegó³y
+                                        </a>
+                                        @if (product.Stock > 0)
+                                        {
+                                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                                <input type="hidden" name="productId" value="@product.Id" />
+                                                <input type="hidden" name="qty" value="1" />
+                                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                                    <i class="bi bi-cart-plus me-1"></i> Do koszyka
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+</style>

@@ -1,0 +1,160 @@
+@model Avocado_shop.Models.Category
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Strona g³ówna</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Categories" asp-action="Index">Kategorie</a></li>
+            @if (Model.ParentCategory != null)
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@Model.ParentCategoryId">
+                        @Model.ParentCategory.Name
+                    </a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h1>
+                @if (!string.IsNullOrEmpty(Model.IconClass))
+                {
+                    <i class="@Model.IconClass me-2"></i>
+                }
+                @Model.Name
+            </h1>
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <p class="lead text-muted">@Model.Description</p>
+            }
+        </div>
+    </div>
+
+    @if (Model.SubCategories != null && Model.SubCategories.Any())
+    {
+        <!-- Wyœwietl podkategorie -->
+        <h4 class="mb-3">Wybierz podkategoriê</h4>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            @foreach (var sub in Model.SubCategories)
+            {
+                <div class="col">
+                    <div class="card h-100 subcategory-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                @if (!string.IsNullOrEmpty(sub.IconClass))
+                                {
+                                    <i class="@sub.IconClass me-2"></i>
+                                }
+                                @sub.Name
+                            </h5>
+                            @if (!string.IsNullOrEmpty(sub.Description))
+                            {
+                                <p class="card-text text-muted small">@sub.Description</p>
+                            }
+                            @if (sub.MinPrice.HasValue || sub.MaxPrice.HasValue)
+                            {
+                                <p class="mb-0">
+                                    <span class="badge bg-success">
+                                        @if (sub.MinPrice.HasValue && sub.MaxPrice.HasValue)
+                                        {
+                                            @:@sub.MinPrice.Value.ToString("N0") - @sub.MaxPrice.Value.ToString("N0") z³
+                                        }
+                                        else if (sub.MaxPrice.HasValue)
+                                        {
+                                            @:Do @sub.MaxPrice.Value.ToString("N0") z³
+                                        }
+                                        else if (sub.MinPrice.HasValue)
+                                        {
+                                            @:Od @sub.MinPrice.Value.ToString("N0") z³
+                                        }
+                                    </span>
+                                </p>
+                            }
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a asp-action="Products" asp-route-id="@sub.Id" class="btn btn-outline-primary btn-sm">
+                                Zobacz produkty <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Model.Products != null && Model.Products.Any())
+    {
+        <!-- Wyœwietl produkty bezpoœrednio w tej kategorii -->
+        <h4 class="mb-3">Produkty w tej kategorii</h4>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @foreach (var product in Model.Products)
+            {
+                <div class="col">
+                    <div class="card h-100 product-card">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: contain; padding: 10px;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="bi bi-image text-muted display-4"></i>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <h6 class="card-title">@product.Name</h6>
+                            <p class="card-text text-muted small">
+                                @(product.Description?.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 mb-0 text-primary">@product.Price.ToString("N2") z³</span>
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-sm btn-primary">
+                                    Szczegó³y
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if ((Model.SubCategories == null || !Model.SubCategories.Any()) && (Model.Products == null || !Model.Products.Any()))
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Ta kategoria jest pusta. Wróæ póŸniej!
+        </div>
+    }
+
+    <!-- Przycisk do wszystkich produktów w kategorii -->
+    @if (Model.SubCategories != null && Model.SubCategories.Any())
+    {
+        <div class="mt-4">
+            <a asp-action="Products" asp-route-id="@Model.Id" class="btn btn-lg btn-outline-primary">
+                <i class="bi bi-grid me-2"></i> Zobacz wszystkie produkty w kategorii "@Model.Name"
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .subcategory-card, .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .subcategory-card:hover, .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+</style>

@@ -1,0 +1,21 @@
+@model Avocado_shop.Models.Category
+
+@{
+    ViewData["Title"] = "Usuñ kategoriê";
+}
+
+<h1>Usuñ kategoriê</h1>
+
+<h4>Czy na pewno chcesz usun¹æ tê kategoriê?</h4>
+
+<div>
+    <h5>@Model.Name</h5>
+    <p>@Model.Description</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Usuñ</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

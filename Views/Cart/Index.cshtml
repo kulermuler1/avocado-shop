@@ -1,0 +1,137 @@
+@model IEnumerable<(Avocado_shop.Models.Product product, int qty)>
+
+@{
+    ViewData["Title"] = "Koszyk";
+    var total = Model.Sum(x => x.product.Price * x.qty);
+}
+
+<div class="container">
+    <h1 class="mb-4"><i class="bi bi-cart3 me-2"></i>Koszyk</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+                <h4 class="text-muted">Twój koszyk jest pusty</h4>
+                <p class="text-muted">Dodaj produkty do koszyka, aby kontynuowaæ zakupy.</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg mt-3">
+                    <i class="bi bi-box-seam me-2"></i>Przegl¹daj produkty
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Lista produktów w koszyku -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-bag me-2"></i>Produkty (@Model.Count())</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50%">Produkt</th>
+                                        <th class="text-center">Iloœæ</th>
+                                        <th class="text-end">Cena</th>
+                                        <th class="text-end">Suma</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                                        @if (!string.IsNullOrEmpty(item.product.ImageUrl))
+                                                        {
+                                                            <img src="@item.product.ImageUrl" alt="@item.product.Name" class="img-fluid" style="max-height: 50px;">
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="bi bi-box text-muted"></i>
+                                                        }
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">@item.product.Name</h6>
+                                                        <small class="text-muted">@item.product.Category?.Name</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <span class="badge bg-secondary fs-6">@item.qty</span>
+                                            </td>
+                                            <td class="text-end align-middle">
+                                                @item.product.Price.ToString("N2") z³
+                                            </td>
+                                            <td class="text-end align-middle fw-bold">
+                                                @((item.product.Price * item.qty).ToString("N2")) z³
+                                            </td>
+                                            <td class="text-end align-middle">
+                                                <form asp-action="Remove" method="post" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@item.product.Id" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Usuñ z koszyka">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Kontynuuj zakupy
+                </a>
+            </div>
+
+            <!-- Podsumowanie -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Podsumowanie</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Produkty (@Model.Sum(x => x.qty) szt.)</span>
+                            <span>@total.ToString("N2") z³</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Dostawa</span>
+                            <span class="text-success">Gratis</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="h5 mb-0">Razem</span>
+                            <span class="h5 mb-0 text-primary fw-bold">@total.ToString("N2") z³</span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary btn-lg">
+                                <i class="bi bi-credit-card me-2"></i>PrzejdŸ do kasy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informacje -->
+                <div class="card mt-3">
+                    <div class="card-body small text-muted">
+                        <p class="mb-2"><i class="bi bi-shield-check text-success me-2"></i>Bezpieczne p³atnoœci</p>
+                        <p class="mb-2"><i class="bi bi-truck text-primary me-2"></i>Darmowa dostawa od 500 z³</p>
+                        <p class="mb-0"><i class="bi bi-arrow-return-left text-warning me-2"></i>14 dni na zwrot</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

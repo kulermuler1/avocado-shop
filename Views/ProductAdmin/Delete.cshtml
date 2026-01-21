@@ -1,0 +1,28 @@
+@model Avocado_shop.Models.Product
+
+@{
+    ViewData["Title"] = "Usuñ produkt";
+}
+
+<h1>Usuñ produkt</h1>
+
+<h4>Czy na pewno chcesz usun¹æ ten produkt?</h4>
+
+<div>
+    <h5>@Model.Name</h5>
+    <p>@Model.Description</p>
+    <p><strong>Cena:</strong> @string.Format("{0:C}", Model.Price)</p>
+    <p><strong>Stan:</strong> @Model.Stock</p>
+    <p><strong>Kategoria:</strong> @Model?.Category?.Name</p>
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@(Model.ImageUrl.StartsWith("/") ? Model.ImageUrl : "/" + Model.ImageUrl)" alt="image" style="max-width:200px; max-height:150px;" />
+    }
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger">Usuñ</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

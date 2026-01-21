@@ -1,8 +1,201 @@
-ï»¿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Strona g³ówna";
+    var categories = ViewData["MainCategories"] as List<Avocado_shop.Models.Category> ?? new List<Avocado_shop.Models.Category>();
+    var featuredProducts = ViewData["FeaturedProducts"] as List<Avocado_shop.Models.Product> ?? new List<Avocado_shop.Models.Product>();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="bg-primary text-white rounded-3 p-5 mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <h1 class="display-4 fw-bold mb-3">
+                <i class="bi bi-pc-display-horizontal me-3"></i>Avocado Shop
+            </h1>
+            <p class="lead mb-4">
+                Twój sklep z komputerami, podzespo³ami i peryferiami. 
+                ZnajdŸ idealny sprzêt dla siebie!
+            </p>
+            <div class="d-flex gap-3">
+                <a asp-controller="Categories" asp-action="Index" class="btn btn-light btn-lg">
+                    <i class="bi bi-grid me-2"></i> Przegl¹daj kategorie
+                </a>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-box-seam me-2"></i> Wszystkie produkty
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+            <i class="bi bi-pc-display display-1" style="font-size: 10rem; opacity: 0.3;"></i>
+        </div>
+    </div>
 </div>
+
+<!-- Kategorie g³ówne -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-grid me-2"></i>Kategorie</h2>
+        <a asp-controller="Categories" asp-action="Index" class="btn btn-outline-primary">
+            Zobacz wszystkie <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @foreach (var category in categories)
+        {
+            <div class="col">
+                <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id" class="text-decoration-none">
+                    <div class="card h-100 category-card border-0 shadow-sm">
+                        <div class="card-body text-center py-4">
+                            <div class="category-icon mb-3">
+                                @if (!string.IsNullOrEmpty(category.IconClass))
+                                {
+                                    <i class="@category.IconClass display-4 text-primary"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-folder display-4 text-primary"></i>
+                                }
+                            </div>
+                            <h5 class="card-title text-dark">@category.Name</h5>
+                            <p class="card-text text-muted small mb-0">
+                                @(category.Description?.Length > 50 ? category.Description.Substring(0, 50) + "..." : category.Description)
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Polecane produkty -->
+@if (featuredProducts.Any())
+{
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-star me-2"></i>Polecane produkty</h2>
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary">
+                Zobacz wiêcej <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @foreach (var product in featuredProducts.Take(8))
+            {
+                <div class="col">
+                    <div class="card h-100 product-card shadow-sm">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" 
+                                 style="height: 180px; object-fit: contain; padding: 15px; background: #f8f9fa;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <i class="bi bi-image text-muted display-4"></i>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <p class="text-muted small mb-1">@product.Category?.Name</p>
+                            <h6 class="card-title">@product.Name</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h5 text-primary mb-0">@product.Price.ToString("N2") z³</span>
+                                @if (product.Stock > 0)
+                                {
+                                    <span class="badge bg-success">Dostêpny</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Brak</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye me-1"></i> Szczegó³y
+                                </a>
+                                @if (product.Stock > 0)
+                                {
+                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="qty" value="1" />
+                                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                                            <i class="bi bi-cart-plus me-1"></i> Do koszyka
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+<!-- Informacje o sklepie -->
+<section class="mb-5">
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-truck display-4 text-primary mb-3"></i>
+                <h5>Darmowa dostawa</h5>
+                <p class="text-muted small mb-0">Przy zamówieniach powy¿ej 500 z³</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
+                <h5>Gwarancja</h5>
+                <p class="text-muted small mb-0">24 miesi¹ce gwarancji</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-credit-card display-4 text-primary mb-3"></i>
+                <h5>Bezpieczne p³atnoœci</h5>
+                <p class="text-muted small mb-0">Szyfrowane transakcje</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-center p-3">
+                <i class="bi bi-headset display-4 text-primary mb-3"></i>
+                <h5>Wsparcie 24/7</h5>
+                <p class="text-muted small mb-0">Pomoc techniczna</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .category-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+
+    .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+    }
+
+    .category-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 50%;
+    }
+</style>

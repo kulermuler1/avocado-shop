@@ -1,0 +1,55 @@
+@model IEnumerable<Avocado_shop.Models.Category>
+
+@{
+    ViewData["Title"] = "Kategorie";
+}
+
+<div class="container">
+    <h1 class="mb-4">Kategorie produktów</h1>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @foreach (var category in Model)
+        {
+            <div class="col">
+                <div class="card h-100 category-card">
+                    <div class="card-body text-center">
+                        @if (!string.IsNullOrEmpty(category.IconClass))
+                        {
+                            <i class="@category.IconClass display-1 text-primary mb-3"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-folder display-1 text-primary mb-3"></i>
+                        }
+                        <h5 class="card-title">@category.Name</h5>
+                        <p class="card-text text-muted">@category.Description</p>
+
+                        @if (category.SubCategories != null && category.SubCategories.Any())
+                        {
+                            <p class="small text-secondary">
+                                @category.SubCategories.Count podkategorii
+                            </p>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-center">
+                        <a asp-action="Details" asp-route-id="@category.Id" class="btn btn-primary">
+                            Przegl¹daj <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .category-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+</style>

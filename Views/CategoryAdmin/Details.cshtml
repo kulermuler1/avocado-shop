@@ -1,0 +1,17 @@
+@model Avocado_shop.Models.Category
+
+@{
+    ViewData["Title"] = "Szczegó³y kategorii";
+}
+
+<h1>Szczegó³y</h1>
+
+<div>
+    <h4>@Model.Name</h4>
+    <p>@Model.Description</p>
+</div>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edytuj</a>
+    <a asp-action="Index" class="btn btn-secondary">Powrót</a>
+</p>

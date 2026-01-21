@@ -1,0 +1,184 @@
+@model IEnumerable<Avocado_shop.Models.Order>
+
+@{
+    ViewData["Title"] = "Zarz¹dzanie zamówieniami";
+    var userEmails = ViewBag.UserEmails as Dictionary<string, string?> ?? new Dictionary<string, string?>();
+    var currentStatus = ViewBag.CurrentStatus as string;
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-bag me-2"></i>Zarz¹dzanie zamówieniami</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Powrót do panelu
+        </a>
+    </div>
+
+    <!-- Filtry -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="Orders" class="btn @(currentStatus == null ? "btn-primary" : "btn-outline-primary")">
+                    Wszystkie (@Model.Count())
+                </a>
+                <a asp-action="Orders" asp-route-status="Nowe" 
+                   class="btn @(currentStatus == "Nowe" ? "btn-danger" : "btn-outline-danger")">
+                    <i class="bi bi-exclamation-circle me-1"></i>Nowe
+                </a>
+                <a asp-action="Orders" asp-route-status="W realizacji" 
+                   class="btn @(currentStatus == "W realizacji" ? "btn-warning" : "btn-outline-warning")">
+                    <i class="bi bi-hourglass-split me-1"></i>W realizacji
+                </a>
+                <a asp-action="Orders" asp-route-status="Wys³ane" 
+                   class="btn @(currentStatus == "Wys³ane" ? "btn-info" : "btn-outline-info")">
+                    <i class="bi bi-truck me-1"></i>Wys³ane
+                </a>
+                <a asp-action="Orders" asp-route-status="Zakoñczone" 
+                   class="btn @(currentStatus == "Zakoñczone" ? "btn-success" : "btn-outline-success")">
+                    <i class="bi bi-check-circle me-1"></i>Zakoñczone
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>Brak zamówieñ do wyœwietlenia.
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nr zamówienia</th>
+                                <th>Data</th>
+                                <th>U¿ytkownik</th>
+                                <th class="text-end">Kwota</th>
+                                <th>Status</th>
+                                <th class="text-end">Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td class="align-middle">
+                                        <strong>#@order.Id</strong>
+                                    </td>
+                                    <td class="align-middle">
+                                        @order.OrderDate.ToString("dd.MM.yyyy")<br>
+                                        <small class="text-muted">@order.OrderDate.ToString("HH:mm")</small>
+                                    </td>
+                                    <td class="align-middle">
+                                        <i class="bi bi-person me-1"></i>
+                                        @(userEmails.ContainsKey(order.UserId) ? userEmails[order.UserId] : "Nieznany")
+                                    </td>
+                                    <td class="text-end align-middle">
+                                        <strong class="text-primary">@order.TotalPrice.ToString("N2") z³</strong>
+                                    </td>
+                                    <td class="align-middle">
+                                        @switch (order.Status)
+                                        {
+                                            case "Nowe":
+                                                <span class="badge bg-primary"><i class="bi bi-exclamation-circle me-1"></i>@order.Status</span>
+                                                break;
+                                            case "W realizacji":
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>@order.Status</span>
+                                                break;
+                                            case "Wys³ane":
+                                                <span class="badge bg-info"><i class="bi bi-truck me-1"></i>@order.Status</span>
+                                                break;
+                                            case "Zakoñczone":
+                                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>@order.Status</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">@order.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-end align-middle">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Zmieñ status
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <form asp-action="UpdateOrderStatus" method="post">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="Nowe" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-exclamation-circle text-primary me-2"></i>Nowe
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form asp-action="UpdateOrderStatus" method="post">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="W realizacji" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-hourglass-split text-warning me-2"></i>W realizacji
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form asp-action="UpdateOrderStatus" method="post">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="Wys³ane" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-truck text-info me-2"></i>Wys³ane
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form asp-action="UpdateOrderStatus" method="post">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="Zakoñczone" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="bi bi-check-circle text-success me-2"></i>Zakoñczone
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary ms-1">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podsumowanie -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h4 class="text-primary">@Model.Count()</h4>
+                        <small class="text-muted">Zamówieñ ³¹cznie</small>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-success">@Model.Sum(o => o.TotalPrice).ToString("N2") z³</h4>
+                        <small class="text-muted">Wartoœæ ³¹cznie</small>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-danger">@Model.Count(o => o.Status == "Nowe")</h4>
+                        <small class="text-muted">Nowych do realizacji</small>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-info">@Model.Count(o => o.Status == "Wys³ane")</h4>
+                        <small class="text-muted">W drodze</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

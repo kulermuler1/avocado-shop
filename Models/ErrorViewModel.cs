@@ -1,9 +1,8 @@
-namespace Sklep_internetowy.Models
+namespace Avocado_shop.Models
 {
-    public class Users
+    public class ErrorViewModel
     {
         public string? RequestId { get; set; }
-
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 }

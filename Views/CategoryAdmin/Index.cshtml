@@ -1,0 +1,112 @@
+@model IEnumerable<Avocado_shop.Models.Category>
+
+@{
+    ViewData["Title"] = "Kategorie - Panel Admina";
+    var mainCategories = Model.Where(c => c.ParentCategoryId == null).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-folder me-2"></i>Kategorie</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Dodaj now¹ kategoriê
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Brak kategorii. Dodaj pierwsz¹ kategoriê!
+    </div>
+}
+else
+{
+    <div class="accordion" id="categoriesAccordion">
+        @foreach (var mainCat in mainCategories)
+        {
+            var subCategories = Model.Where(c => c.ParentCategoryId == mainCat.Id).ToList();
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-@mainCat.Id">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-@mainCat.Id" aria-expanded="false">
+                        @if (!string.IsNullOrEmpty(mainCat.IconClass))
+                        {
+                            <i class="@mainCat.IconClass me-2"></i>
+                        }
+                        <strong>@mainCat.Name</strong>
+                        <span class="badge bg-secondary ms-2">@subCategories.Count podkategorii</span>
+                    </button>
+                </h2>
+                <div id="collapse-@mainCat.Id" class="accordion-collapse collapse" data-bs-parent="#categoriesAccordion">
+                    <div class="accordion-body">
+                        <div class="mb-3">
+                            <p class="text-muted">@mainCat.Description</p>
+                            <a asp-action="Details" asp-route-id="@mainCat.Id" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Szczegó³y
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@mainCat.Id" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i> Edytuj
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@mainCat.Id" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Usuñ
+                            </a>
+                        </div>
+
+                        @if (subCategories.Any())
+                        {
+                            <h6 class="mt-3">Podkategorie:</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Nazwa</th>
+                                        <th>Progi cenowe</th>
+                                        <th>Ikona</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var sub in subCategories)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(sub.IconClass))
+                                                {
+                                                    <i class="@sub.IconClass me-1"></i>
+                                                }
+                                                @sub.Name
+                                            </td>
+                                            <td>
+                                                @if (sub.MinPrice.HasValue || sub.MaxPrice.HasValue)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        @(sub.MinPrice?.ToString("N0") ?? "0") - @(sub.MaxPrice?.ToString("N0") ?? "?") z³
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td><code>@sub.IconClass</code></td>
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@sub.Id" class="btn btn-sm btn-outline-warning">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@sub.Id" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p class="text-muted small">Brak podkategorii</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

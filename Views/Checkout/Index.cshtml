@@ -1,0 +1,93 @@
+@model Avocado_shop.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Finalizacja zamówienia";
+}
+
+<div class="container">
+    <h1 class="mb-4"><i class="bi bi-credit-card me-2"></i>Finalizacja zamówienia</h1>
+
+    <div class="row">
+        <!-- Formularz -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Dane dostawy</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Place" method="post">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label asp-for="FullName" class="form-label">Imiê i nazwisko *</label>
+                                <input asp-for="FullName" class="form-control" placeholder="Jan Kowalski" />
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label asp-for="AddressLine" class="form-label">Adres *</label>
+                                <input asp-for="AddressLine" class="form-control" placeholder="ul. Przyk³adowa 123/4" />
+                                <span asp-validation-for="AddressLine" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="PostalCode" class="form-label">Kod pocztowy *</label>
+                                <input asp-for="PostalCode" class="form-control" placeholder="00-000" />
+                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="City" class="form-label">Miasto *</label>
+                                <input asp-for="City" class="form-control" placeholder="Warszawa" />
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label asp-for="Country" class="form-label">Kraj *</label>
+                                <input asp-for="Country" class="form-control" value="Polska" />
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Wróæ do koszyka
+                            </a>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Z³ó¿ zamówienie
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Informacje</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">
+                        <i class="bi bi-shield-check text-success me-2"></i>
+                        Twoje dane s¹ bezpieczne i szyfrowane.
+                    </p>
+                    <p class="small text-muted mb-3">
+                        <i class="bi bi-truck text-primary me-2"></i>
+                        Darmowa dostawa przy zamówieniach powy¿ej 500 z³.
+                    </p>
+                    <p class="small text-muted mb-0">
+                        <i class="bi bi-credit-card text-warning me-2"></i>
+                        P³atnoœæ przy odbiorze (symulacja).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
