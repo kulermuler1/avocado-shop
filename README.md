@@ -1,189 +1,202 @@
-# Avocado Shop - Sklep Komputerowy
+Avocado Shop â€“ Computer Store
+An online store for computers and computer components. The system allows browsing products, placing orders, managing the shopping cart, and includes an administration panel.
 
-Sklep internetowy z komputerami i podzespo³ami komputerowymi. System umo¿liwia przegl¹danie produktów, sk³adanie zamówieñ, zarz¹dzanie koszykiem oraz panel administracyjny.
+Technologies
+ASP.NET Core MVC (.NET 9)
 
-## Technologie
+Entity Framework Core
 
-- ASP.NET Core MVC (.NET 9)
-- Entity Framework Core
-- ASP.NET Core Identity
-- SQLite
-- Bootstrap 5 + Bootstrap Icons
+ASP.NET Core Identity
 
-## Wymagania
+SQLite
 
-- .NET 9 SDK
-- Visual Studio 2022 / VS Code
+Bootstrap 5 + Bootstrap Icons
 
-## Instalacja i uruchomienie
+Requirements
+.NET 9 SDK
 
-1. Sklonuj repozytorium:
-```bash
+Visual Studio 2022 / VS Code
+
+Installation and running
+Clone the repository:
+
+bash
 git clone https://github.com/kulermuler1/Sklep_internetowy.git
 cd Avocado_shop
-```
+Restore packages:
 
-2. Przywróæ pakiety:
-```bash
+bash
 dotnet restore
-```
+Apply database migrations:
 
-3. Zastosuj migracje bazy danych:
-```bash
+bash
 dotnet ef database update
-```
+Run the application:
 
-4. Uruchom aplikacjê:
-```bash
+bash
 dotnet run
-```
+The application will be available at: https://localhost:5001 or http://localhost:5000.
 
-5. Aplikacja bêdzie dostêpna pod adresem: `https://localhost:5001` lub `http://localhost:5000`
+Database (SQLite)
+Database file: Avocado_Shop.db (created automatically)
 
-## Baza danych (SQLite)
-
-Plik bazy danych: `Avocado_Shop.db` (tworzony automatycznie)
-
-### Connection String
-```json
+Connection string
+json
 "ConnectionStrings": {
   "AvocadoDBContextConnection": "Data Source=Avocado_Shop.db"
 }
-```
+Test users
+The application automatically creates accounts on first run:
 
-## Testowi u¿ytkownicy
+Administrator
+Email: admin@local.test
 
-Aplikacja automatycznie tworzy konta przy pierwszym uruchomieniu:
+Password: Admin123
 
-### Administrator
-- **Email:** admin@local.test
-- **Has³o:** Admin123
-- **Uprawnienia:** Pe³ny dostêp - zarz¹dzanie produktami, kategoriami, u¿ytkownikami i zamówieniami
+Permissions: Full access â€“ manage products, categories, users, and orders
 
-### Zwyk³y u¿ytkownik
-Nowi u¿ytkownicy mog¹ siê zarejestrowaæ przez formularz rejestracji.
-- **Uprawnienia:** Przegl¹danie produktów, sk³adanie zamówieñ, historia zamówieñ
+Regular user
+New users can register using the registration form.
 
-## Funkcjonalnoœci
+Permissions: Browse products, place orders, view order history
 
-### Autoryzacja
-- Rejestracja i logowanie u¿ytkowników
-- Dwie role: **Admin** i **User**
-- Admin: pe³ny dostêp do panelu administracyjnego
-- User: przegl¹danie, koszyk, sk³adanie zamówieñ
+Features
+Authentication and authorization
+User registration and login
 
-### Produkty
-- Przegl¹danie produktów z podzia³em na kategorie
-- Szczegó³y produktu z opisem i cen¹
-- Filtrowanie po kategoriach
-- Dodawanie do koszyka
+Two roles: Admin and User
 
-### Kategorie (hierarchia)
-- Kategorie g³ówne: Gotowe zestawy, Podzespo³y, Peryferia, Monitory
-- Podkategorie z przedzia³ami cenowymi lub typami produktów
-- Przegl¹danie produktów w danej kategorii
+Admin: full access to the admin panel
 
-### Koszyk
-- Dodawanie/usuwanie produktów
-- Zmiana iloœci
-- Podsumowanie zamówienia
-- Przejœcie do finalizacji
+User: browsing, cart, placing orders
 
-### Zamówienia
-- Sk³adanie zamówieñ z danymi dostawy
-- Historia zamówieñ u¿ytkownika
-- Szczegó³y zamówienia
+Products
+Browsing products by category
 
-### Panel Administratora
-- **Dashboard** - statystyki sklepu (u¿ytkownicy, zamówienia, produkty, przychód)
-- **U¿ytkownicy** - lista u¿ytkowników z rolami, nadawanie/odbieranie uprawnieñ admina
-- **Zamówienia** - wszystkie zamówienia, zmiana statusów (Nowe ? W realizacji ? Wys³ane ? Zakoñczone)
-- **Produkty** - CRUD (dodawanie, edycja, usuwanie)
-- **Kategorie** - CRUD (dodawanie, edycja, usuwanie)
+Product details with description and price
 
-### Formularze z walidacj¹
-- **Rejestracja:** Email (wymagany), Has³o (min. 6 znaków, wielka litera, cyfra)
-- **Logowanie:** Email, Has³o
-- **Produkt:** Nazwa (wymagana), Opis, Cena, Stan magazynowy, Kategoria, URL obrazu
-- **Zamówienie:** Imiê i nazwisko, Adres, Miasto, Kod pocztowy, Kraj
+Filtering by categories
 
-## Struktura bazy danych
+Adding products to the cart
 
-### Encje
+Categories (hierarchy)
+Main categories: Preâ€‘built PCs, Components, Peripherals, Monitors
 
-**Category (Kategoria)**
-- Id, Name, Description, IconClass, MinPrice, MaxPrice, ParentCategoryId
-- Relacje: wiele Products, wiele SubCategories (hierarchia)
+Subcategories with price ranges or product types
 
-**Product (Produkt)**
-- Id, Name, Description, Price, Stock, ImageUrl, CategoryId
-- Relacje: jedna Category, wiele OrderItems
+Browsing products within a given category
 
-**Order (Zamówienie)**
-- Id, UserId, OrderDate, Status, TotalPrice
-- Relacje: wiele OrderItems
+Cart
+Adding and removing products
 
-**OrderItem (Pozycja zamówienia)**
-- Id, OrderId, ProductId, Quantity, Price
-- Relacje: jedno Order, jeden Product
+Changing quantities
 
-**IdentityUser (U¿ytkownik)** - ASP.NET Core Identity
-- Id, Email, UserName, PasswordHash, ...
-- Relacje: wiele Orders
+Order summary
 
-### Zwi¹zki miêdzy encjami
+Proceeding to checkout
 
-```
-Category (1) ?? (N) Category (hierarchia - podkategorie)
-Category (1) ?? (N) Product
-IdentityUser (1) ?? (N) Order
-Order (1) ?? (N) OrderItem
-Product (1) ?? (N) OrderItem
-```
+Orders
+Placing orders with delivery details
 
-## Struktura projektu
+User order history
 
-```
+Order details
+
+Admin panel
+Dashboard â€“ store statistics (users, orders, products, revenue)
+
+Users â€“ list of users with roles, granting/revoking admin rights
+
+Orders â€“ all orders, changing statuses (New â†’ Processing â†’ Shipped â†’ Completed)
+
+Products â€“ full CRUD (create, read, update, delete)
+
+Categories â€“ full CRUD (create, read, update, delete)
+
+Forms with validation
+Registration: Email (required), password (min. 6 characters, uppercase letter, digit)
+
+Login: Email, password
+
+Product: Name (required), description, price, stock, category, image URL
+
+Order: First and last name, address, city, postal code, country
+
+Database structure
+Entities
+Category
+
+Id, Name, Description, IconClass, MinPrice, MaxPrice, ParentCategoryId
+
+Relations: many Products, many SubCategories (hierarchy)
+
+Product
+
+Id, Name, Description, Price, Stock, ImageUrl, CategoryId
+
+Relations: one Category, many OrderItems
+
+Order
+
+Id, UserId, OrderDate, Status, TotalPrice
+
+Relations: many OrderItems
+
+OrderItem
+
+Id, OrderId, ProductId, Quantity, Price
+
+Relations: one Order, one Product
+
+IdentityUser (User) â€“ ASP.NET Core Identity
+
+Id, Email, UserName, PasswordHash, ...
+
+Relations: many Orders
+
+Relationships between entities
+text
+Category (1) â†’ (N) Category (hierarchy â€“ subcategories)
+Category (1) â†’ (N) Product
+IdentityUser (1) â†’ (N) Order
+Order (1) â†’ (N) OrderItem
+Product (1) â†’ (N) OrderItem
+Project structure
+text
 Avocado_shop/
-??? Areas/
-?   ??? Identity/               # Strony logowania/rejestracji
-??? Controllers/
-?   ??? AdminController.cs      # Panel admina
-?   ??? CartController.cs       # Koszyk
-?   ??? CategoriesController.cs # Kategorie
-?   ??? CategoryAdminController.cs
-?   ??? CheckoutController.cs   # Finalizacja zamówienia
-?   ??? HomeController.cs       # Strona g³ówna
-?   ??? OrdersController.cs     # Zamówienia u¿ytkownika
-?   ??? ProductAdminController.cs
-?   ??? ProductsController.cs   # Lista produktów
-??? Data/
-?   ??? DbInitializer.cs        # Seed danych
-??? Models/
-?   ??? Category.cs
-?   ??? Product.cs
-?   ??? Order.cs
-?   ??? OrderItem.cs
-??? Services/
-?   ??? CartService.cs          # Obs³uga koszyka
-?   ??? OrderService.cs         # Tworzenie zamówieñ
-??? Views/
-??? wwwroot/
-??? Program.cs
-??? appsettings.json
-```
+â”œâ”€â”€ Areas/
+â”‚   â””â”€â”€ Identity/                # Login/registration pages
+â”œâ”€â”€ Controllers/
+â”‚   â”œâ”€â”€ AdminController.cs       # Admin panel
+â”‚   â”œâ”€â”€ CartController.cs        # Cart
+â”‚   â”œâ”€â”€ CategoriesController.cs  # Categories
+â”‚   â”œâ”€â”€ CategoryAdminController.cs
+â”‚   â”œâ”€â”€ CheckoutController.cs    # Checkout
+â”‚   â”œâ”€â”€ HomeController.cs        # Home page
+â”‚   â”œâ”€â”€ OrdersController.cs      # User orders
+â”‚   â”œâ”€â”€ ProductAdminController.cs
+â”‚   â””â”€â”€ ProductsController.cs    # Product list
+â”œâ”€â”€ Data/
+â”‚   â””â”€â”€ DbInitializer.cs         # Data seeding
+â”œâ”€â”€ Models/
+â”‚   â”œâ”€â”€ Category.cs
+â”‚   â”œâ”€â”€ Product.cs
+â”‚   â”œâ”€â”€ Order.cs
+â”‚   â””â”€â”€ OrderItem.cs
+â”œâ”€â”€ Services/
+â”‚   â”œâ”€â”€ CartService.cs           # Cart handling
+â”‚   â””â”€â”€ OrderService.cs          # Order creation
+â”œâ”€â”€ Views/
+â”œâ”€â”€ wwwroot/
+â”œâ”€â”€ Program.cs
+â””â”€â”€ appsettings.json
+Migrations
+If migrations have not been applied yet:
 
-## Migracje
-
-Jeœli migracje nie zosta³y zastosowane:
-```bash
+bash
 dotnet ef database update
-```
+Author
+Educational project â€“ Databases in the Internet and Applications course.
 
-## Autor
-
-Projekt edukacyjny - Bazy Danych w Internecie i Aplikacjach.
-
-## Licencja
-
-Ikony: [Flaticon](https://www.flaticon.com/)
+License
+Icons: Flaticon
